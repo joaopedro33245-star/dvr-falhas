@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -5,39 +6,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Falhas de DVR</title>
 <style>
+  /* Tema escuro fixo (não muda com o sistema/navegador do usuário) */
   :root {
-    color-scheme: light;
-    --surface-1:      #fcfcfb;
-    --page-plane:     #f9f9f7;
-    --text-primary:   #0b0b0b;
-    --text-secondary: #52514e;
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
     --text-muted:     #898781;
-    --gridline:       #e1e0d9;
-    --baseline:       #c3c2b7;
-    --border:         rgba(11,11,11,0.10);
-    --series-1:       #2a78d6;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
     --status-good:      #0ca30c;
     --status-warning:   #fab219;
     --status-serious:   #ec835a;
     --status-critical:  #d03b3b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --surface-1:      #1a1a19;
-      --page-plane:     #0d0d0d;
-      --text-primary:   #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted:     #898781;
-      --gridline:       #2c2c2a;
-      --baseline:       #383835;
-      --border:         rgba(255,255,255,0.10);
-      --series-1:       #3987e5;
-      --status-good:      #0ca30c;
-      --status-warning:   #fab219;
-      --status-serious:   #ec835a;
-      --status-critical:  #d03b3b;
-    }
   }
 
   * { box-sizing: border-box; }
@@ -47,7 +31,7 @@
     color: var(--text-primary);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 60px; }
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 28px 20px 60px; }
 
   header { margin-bottom: 22px; }
   header h1 { font-size: 22px; margin: 0 0 4px; }
@@ -87,6 +71,10 @@
     gap: 8px;
     padding: 14px 16px;
     border-bottom: 1px solid var(--gridline);
+    background: var(--surface-1);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
   }
   .filtros select, .filtros input {
     font: inherit;
@@ -98,52 +86,6 @@
     color: var(--text-primary);
   }
   .filtros input[type="search"] { min-width: 200px; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th {
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .02em;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--gridline);
-    white-space: nowrap;
-  }
-  tbody td {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--gridline);
-    vertical-align: top;
-    font-variant-numeric: tabular-nums;
-  }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: var(--page-plane); }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 999px;
-  }
-  .badge.aberta { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 14%, transparent); }
-  .badge.resolvida { color: var(--status-good); background: color-mix(in srgb, var(--status-good) 14%, transparent); }
-  .badge svg { width: 10px; height: 10px; }
-
-  .acao-btn {
-    font: inherit;
-    font-size: 12px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-  }
-  .acao-btn:hover { border-color: var(--series-1); color: var(--series-1); }
 
   .top-praca-row {
     display: grid;
@@ -180,6 +122,127 @@
     font-size: 13px;
   }
   .estado-erro { color: var(--status-critical); }
+
+  /* ---- Quadro (kanban) ---- */
+  .quadro {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .quadro { grid-template-columns: 1fr; }
+  }
+
+  .coluna {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    max-height: 78vh;
+  }
+  .coluna-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gridline);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .coluna-cabecalho .ponto {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex: none;
+  }
+  .coluna-cabecalho .contagem-col {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--page-plane);
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-variant-numeric: tabular-nums;
+  }
+  .coluna-corpo {
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cartao {
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .cartao.nova { border-left-color: var(--status-critical); }
+  .cartao.andamento { border-left-color: var(--status-warning); }
+  .cartao.resolvida { border-left-color: var(--status-good); }
+
+  .cartao .praca {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .cartao .tipo {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .cartao .linha-detalhe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  .cartao .linha-detalhe b { color: var(--text-secondary); font-weight: 600; }
+
+  .cartao .rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--gridline);
+  }
+  .cartao .tempo {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cartao-acoes { display: flex; gap: 6px; }
+  .acao-btn {
+    font: inherit;
+    font-size: 11px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .acao-btn:hover { border-color: var(--series-1); color: var(--series-1); }
+  .acao-btn.principal {
+    border-color: var(--series-1);
+    color: var(--series-1);
+  }
+
+  .coluna-vazia {
+    padding: 24px 10px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
 </style>
 </head>
 <body>
@@ -193,25 +256,19 @@
     <div class="tile"><div class="label">Carregando...</div><div class="value">—</div></div>
   </div>
 
-  <div class="panel" style="margin-bottom:22px;">
+  <div class="panel" style="margin-bottom:16px;">
     <div class="secao-titulo">Praças com mais falhas em aberto</div>
     <div id="topPracas"></div>
   </div>
 
-  <div class="panel">
-    <div class="filtros">
-      <select id="fPraca"><option value="">Todas as praças</option></select>
-      <select id="fTipo"><option value="">Todos os tipos</option></select>
-      <select id="fStatus">
-        <option value="">Todos os status</option>
-        <option value="aberta" selected>Aberta</option>
-        <option value="resolvida">Resolvida</option>
-      </select>
-      <input type="search" id="fBusca" placeholder="Buscar por IP, canal ou câmera..." />
-    </div>
-    <div id="tabelaContainer">
-      <div class="estado-carregando">Carregando eventos...</div>
-    </div>
+  <div class="filtros">
+    <select id="fPraca"><option value="">Todas as praças</option></select>
+    <select id="fTipo"><option value="">Todos os tipos</option></select>
+    <input type="search" id="fBusca" placeholder="Buscar por IP, canal ou câmera..." />
+  </div>
+
+  <div id="quadroContainer">
+    <div class="estado-carregando">Carregando eventos...</div>
   </div>
 </div>
 
@@ -227,12 +284,17 @@
 
   var todasFalhas = [];
 
+  var COLUNAS = [
+    { status: "aberta",       classe: "nova",       titulo: "Nova",         corPonto: "var(--status-critical)" },
+    { status: "em_andamento", classe: "andamento",  titulo: "Em andamento", corPonto: "var(--status-warning)" },
+    { status: "resolvida",    classe: "resolvida",  titulo: "Resolvida",    corPonto: "var(--status-good)" }
+  ];
+
   var elTiles = document.getElementById("tiles");
   var elTopPracas = document.getElementById("topPracas");
-  var elTabela = document.getElementById("tabelaContainer");
+  var elQuadro = document.getElementById("quadroContainer");
   var elFPraca = document.getElementById("fPraca");
   var elFTipo = document.getElementById("fTipo");
-  var elFStatus = document.getElementById("fStatus");
   var elFBusca = document.getElementById("fBusca");
 
   function escapeHtml(s) {
@@ -250,11 +312,18 @@
     return d.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   }
 
-  function iconeBadge(status) {
-    if (status === "resolvida") {
-      return '<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    }
-    return '<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/><path d="M8 5v3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="11" r="1" fill="currentColor"/></svg>';
+  function tempoDecorrido(iso) {
+    if (!iso) return "—";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    var diffMs = Date.now() - d.getTime();
+    var min = Math.floor(diffMs / 60000);
+    if (min < 1) return "agora";
+    if (min < 60) return "há " + min + " min";
+    var h = Math.floor(min / 60);
+    if (h < 24) return "há " + h + "h";
+    var dias = Math.floor(h / 24);
+    return "há " + dias + "d";
   }
 
   async function carregar() {
@@ -265,7 +334,7 @@
       .limit(2000);
 
     if (error) {
-      elTabela.innerHTML = '<div class="estado-erro">Erro ao carregar: ' + escapeHtml(error.message) + '</div>';
+      elQuadro.innerHTML = '<div class="estado-erro">Erro ao carregar: ' + escapeHtml(error.message) + '</div>';
       elTiles.innerHTML = '<div class="tile"><div class="label">Erro</div><div class="value critical">—</div></div>';
       return;
     }
@@ -276,29 +345,26 @@
   }
 
   function popularFiltros() {
+    var pracaAtual = elFPraca.value, tipoAtual = elFTipo.value;
     var pracas = Array.from(new Set(todasFalhas.map(function (f) { return f.dispositivo; }).filter(Boolean))).sort();
     var tipos = Array.from(new Set(todasFalhas.map(function (f) { return f.tipo_falha; }).filter(Boolean))).sort();
 
-    pracas.forEach(function (p) {
-      var opt = document.createElement("option");
-      opt.value = p; opt.textContent = p;
-      elFPraca.appendChild(opt);
-    });
-    tipos.forEach(function (t) {
-      var opt = document.createElement("option");
-      opt.value = t; opt.textContent = t;
-      elFTipo.appendChild(opt);
-    });
+    elFPraca.innerHTML = '<option value="">Todas as praças</option>' +
+      pracas.map(function (p) { return '<option value="' + escapeHtml(p) + '">' + escapeHtml(p) + '</option>'; }).join("");
+    elFTipo.innerHTML = '<option value="">Todos os tipos</option>' +
+      tipos.map(function (t) { return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join("");
+
+    elFPraca.value = pracaAtual;
+    elFTipo.value = tipoAtual;
   }
 
   function filtrar() {
-    var praca = elFPraca.value, tipo = elFTipo.value, status = elFStatus.value;
+    var praca = elFPraca.value, tipo = elFTipo.value;
     var busca = elFBusca.value.trim().toLowerCase();
 
     return todasFalhas.filter(function (f) {
       if (praca && f.dispositivo !== praca) return false;
       if (tipo && f.tipo_falha !== tipo) return false;
-      if (status && f.status !== status) return false;
       if (busca) {
         var alvo = [f.ip_dvr, f.canal, f.nome_camera].join(" ").toLowerCase();
         if (alvo.indexOf(busca) === -1) return false;
@@ -307,9 +373,9 @@
     });
   }
 
-  function renderTiles(lista) {
+  function renderTiles() {
     var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    var abertas = todasFalhas.filter(function (f) { return f.status === "aberta"; });
+    var abertas = todasFalhas.filter(function (f) { return f.status !== "resolvida"; });
     var hojeCount = todasFalhas.filter(function (f) {
       if (!f.horario_alarme) return false;
       return new Date(f.horario_alarme) >= hoje;
@@ -330,7 +396,7 @@
   }
 
   function renderTopPracas() {
-    var abertas = todasFalhas.filter(function (f) { return f.status === "aberta"; });
+    var abertas = todasFalhas.filter(function (f) { return f.status !== "resolvida"; });
     var contagem = {};
     abertas.forEach(function (f) {
       var k = f.dispositivo || "(sem praça)";
@@ -356,45 +422,77 @@
     }).join("");
   }
 
-  function renderTabela() {
-    var lista = filtrar();
-
-    if (!lista.length) {
-      elTabela.innerHTML = '<div class="estado-vazio">Nenhum evento encontrado com esses filtros.</div>';
-      return;
+  // Qual botão(ões) aparecem em cada coluna, e pra qual status cada um move o cartão
+  function acoesPara(status) {
+    if (status === "aberta") {
+      return [{ rotulo: "Iniciar atendimento", novoStatus: "em_andamento", principal: true }];
     }
+    if (status === "em_andamento") {
+      return [
+        { rotulo: "Marcar resolvida", novoStatus: "resolvida", principal: true },
+        { rotulo: "Voltar pra Nova", novoStatus: "aberta", principal: false }
+      ];
+    }
+    // resolvida
+    return [{ rotulo: "Reabrir", novoStatus: "aberta", principal: false }];
+  }
 
-    var linhas = lista.map(function (f) {
-      var statusClasse = f.status === "resolvida" ? "resolvida" : "aberta";
-      var statusTexto = f.status === "resolvida" ? "Resolvida" : "Aberta";
-      var proximaAcao = f.status === "resolvida" ? "Reabrir" : "Marcar resolvida";
-      return '<tr>' +
-        '<td>' + formatarData(f.horario_alarme) + '</td>' +
-        '<td>' + escapeHtml(f.tipo_falha) + '</td>' +
-        '<td>' + escapeHtml(f.dispositivo) + '</td>' +
-        '<td>' + escapeHtml(f.canal) + '</td>' +
-        '<td>' + escapeHtml(f.nome_camera) + '</td>' +
-        '<td>' + escapeHtml(f.ip_dvr) + '</td>' +
-        '<td><span class="badge ' + statusClasse + '">' + iconeBadge(f.status) + statusTexto + '</span></td>' +
-        '<td><button class="acao-btn" data-id="' + f.id + '" data-status="' + f.status + '">' + proximaAcao + '</button></td>' +
-        '</tr>';
+  function cartaoHtml(f, classeColuna) {
+    var acoes = acoesPara(f.status);
+    var botoes = acoes.map(function (a) {
+      return '<button class="acao-btn' + (a.principal ? ' principal' : '') + '" data-id="' + f.id + '" data-novo-status="' + a.novoStatus + '">' + a.rotulo + '</button>';
     }).join("");
 
-    elTabela.innerHTML =
-      '<table><thead><tr>' +
-      '<th>Horário</th><th>Tipo</th><th>Praça</th><th>Canal</th><th>Câmera</th><th>IP</th><th>Status</th><th></th>' +
-      '</tr></thead><tbody>' + linhas + '</tbody></table>';
+    var detalhes = [];
+    if (f.canal) detalhes.push('<span><b>Canal</b> ' + escapeHtml(f.canal) + '</span>');
+    if (f.nome_camera) detalhes.push('<span><b>Câmera</b> ' + escapeHtml(f.nome_camera) + '</span>');
+    if (f.ip_dvr) detalhes.push('<span><b>IP</b> ' + escapeHtml(f.ip_dvr) + '</span>');
 
-    Array.prototype.forEach.call(elTabela.querySelectorAll(".acao-btn"), function (btn) {
+    return '<div class="cartao ' + classeColuna + '">' +
+      '<div class="praca">' + escapeHtml(f.dispositivo || "(sem praça)") + '</div>' +
+      '<div class="tipo">' + escapeHtml(f.tipo_falha) + '</div>' +
+      (detalhes.length ? '<div class="linha-detalhe">' + detalhes.join("") + '</div>' : '') +
+      '<div class="rodape">' +
+        '<span class="tempo" title="' + formatarData(f.horario_alarme) + '">' + tempoDecorrido(f.horario_alarme) + '</span>' +
+        '<div class="cartao-acoes">' + botoes + '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function renderQuadro() {
+    var lista = filtrar();
+
+    var html = '<div class="quadro">' + COLUNAS.map(function (col) {
+      var itens = lista.filter(function (f) { return f.status === col.status; });
+      var corpo = itens.length
+        ? itens.map(function (f) { return cartaoHtml(f, col.classe); }).join("")
+        : '<div class="coluna-vazia">Nenhum evento aqui.</div>';
+
+      return '<div class="coluna">' +
+        '<div class="coluna-cabecalho">' +
+          '<span class="ponto" style="background:' + col.corPonto + '"></span>' +
+          col.titulo +
+          '<span class="contagem-col">' + itens.length + '</span>' +
+        '</div>' +
+        '<div class="coluna-corpo">' + corpo + '</div>' +
+      '</div>';
+    }).join("") + '</div>';
+
+    elQuadro.innerHTML = html;
+
+    Array.prototype.forEach.call(elQuadro.querySelectorAll(".acao-btn"), function (btn) {
       btn.addEventListener("click", async function () {
         var id = btn.getAttribute("data-id");
-        var statusAtual = btn.getAttribute("data-status");
-        var novoStatus = statusAtual === "resolvida" ? "aberta" : "resolvida";
-        btn.disabled = true;
+        var novoStatus = btn.getAttribute("data-novo-status");
+        var cartao = btn.closest(".cartao");
+        if (cartao) cartao.style.opacity = "0.5";
+        Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = true; });
+
         var { error } = await supabase.from("dvr_falhas").update({ status: novoStatus }).eq("id", id);
         if (error) {
           alert("Não consegui atualizar: " + error.message);
-          btn.disabled = false;
+          if (cartao) cartao.style.opacity = "1";
+          Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = false; });
           return;
         }
         var item = todasFalhas.find(function (f) { return String(f.id) === String(id); });
@@ -407,11 +505,11 @@
   function renderTudo() {
     renderTiles();
     renderTopPracas();
-    renderTabela();
+    renderQuadro();
   }
 
-  [elFPraca, elFTipo, elFStatus].forEach(function (el) { el.addEventListener("change", renderTabela); });
-  elFBusca.addEventListener("input", renderTabela);
+  [elFPraca, elFTipo].forEach(function (el) { el.addEventListener("change", renderQuadro); });
+  elFBusca.addEventListener("input", renderQuadro);
 
   carregar();
   setInterval(carregar, 5 * 60 * 1000); // re-busca a cada 5 min
