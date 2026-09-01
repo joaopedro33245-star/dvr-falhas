@@ -26,12 +26,19 @@ const PALAVRAS_FALHA = [
   "gravacao interrompida",
 ];
 
+// IMPORTANTE: usamos "[ \t]*" (só espaço/tab) em vez de "\s*" entre o rótulo
+// e o valor. "\s" também casa com quebra de linha (\n) -- então, quando um
+// campo vem vazio (ex: "Nome:" sem nada depois, como acontece em alguns DVRs
+// tipo a CELSINA), um "\s*" guloso "pula" a quebra de linha e acaba
+// capturando o conteúdo da LINHA SEGUINTE inteira por engano. Com
+// "[ \t]*" isso não acontece: se não há valor na própria linha, o campo
+// simplesmente fica vazio/nulo, em vez de roubar o valor de outro campo.
 const PADROES = {
-  tipo_falha: /(?:Evento de alarme|Tipo de Alarme)\s*:\s*([^\n\r]+)/i,
-  canal: /Alarme no Canal No\.?\s*:\s*([^\n\r]+)/i,
-  nome_camera: /^Nome\s*:\s*([^\n\r]+)$/im,
-  dispositivo: /Nome do dispositivo de alarme\s*:\s*([^\n\r]+)/i,
-  ip_dvr: /End\.?\s*IP DVR\s*:\s*([^\n\r]+)/i,
+  tipo_falha: /(?:Evento de alarme|Tipo de Alarme)[ \t]*:[ \t]*([^\n\r]*)/i,
+  canal: /Alarme no Canal No\.?[ \t]*:[ \t]*([^\n\r]*)/i,
+  nome_camera: /^Nome[ \t]*:[ \t]*([^\n\r]*)$/im,
+  dispositivo: /Nome do dispositivo de alarme[ \t]*:[ \t]*([^\n\r]*)/i,
+  ip_dvr: /End\.?[ \t]*IP DVR[ \t]*:[ \t]*([^\n\r]*)/i,
 };
 
 // O rotulo do horario vem como "Horário do inicio do alarme(D/M/A H:M:S): 01/09/2026 02:54:52"
@@ -40,7 +47,7 @@ const PADROES = {
 // em vez de tentar recortar depois de um rotulo, procuramos direto o
 // formato de data/hora (D/M/A H:M:S) em qualquer lugar do corpo -- é
 // simples e não depende de como o rótulo foi escrito.
-const DATA_HORA_REGEX = /\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}/;
+const DATA_HORA_REGEX = /\d{1,2}\/\d{1,2}\/\d{4}[ \t]+\d{1,2}:\d{2}:\d{2}/;
 
 function limpar(v) {
   return v ? v.trim() : null;
