@@ -1,0 +1,11 @@
+{
+  "name": "dvr-falhas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ingestao de falhas de DVR (e-mail -> Supabase) + painel de visualizacao",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "imapflow": "^1.0.157",
+    "mailparser": "^3.7.1"
+  }
+}
