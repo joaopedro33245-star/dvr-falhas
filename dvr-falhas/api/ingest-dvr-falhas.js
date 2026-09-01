@@ -23,11 +23,15 @@ const BACKFILL_INICIAL = Number(process.env.INITIAL_BACKFILL || 200);
 
 module.exports = async function handler(req, res) {
   // Protege o endpoint: se CRON_SECRET estiver configurado, só aceita chamada
-  // que traga esse segredo (o Vercel Cron manda automaticamente).
+  // que traga esse segredo — seja no header (o Vercel Cron manda assim
+  // automaticamente) ou em ?secret=... na URL (pra dar pra testar direto
+  // no navegador, sem precisar de terminal/curl).
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const auth = req.headers["authorization"];
-    if (auth !== `Bearer ${cronSecret}`) {
+    const viaQuery = req.query?.secret;
+    const autorizado = auth === `Bearer ${cronSecret}` || viaQuery === cronSecret;
+    if (!autorizado) {
       return res.status(401).json({ error: "unauthorized" });
     }
   }
