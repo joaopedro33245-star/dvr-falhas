@@ -6,18 +6,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Falhas de DVR</title>
 <style>
-  /* Tema escuro fixo (não muda com o sistema/navegador do usuário) */
   :root {
     color-scheme: dark;
     --surface-1:      #1a1a19;
+    --surface-2:      #232322;
     --page-plane:     #0d0d0d;
     --text-primary:   #ffffff;
     --text-secondary: #c3c2b7;
     --text-muted:     #898781;
     --gridline:       #2c2c2a;
-    --baseline:       #383835;
     --border:         rgba(255,255,255,0.10);
     --series-1:       #3987e5;
+    --series-2:       #8b5cf6;
     --status-good:      #0ca30c;
     --status-warning:   #fab219;
     --status-serious:   #ec835a;
@@ -31,50 +31,78 @@
     color: var(--text-primary);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  .wrap { max-width: 1360px; margin: 0 auto; padding: 28px 20px 60px; }
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 24px 20px 60px; }
 
-  header { margin-bottom: 22px; }
+  header { margin-bottom: 20px; }
   header h1 { font-size: 22px; margin: 0 0 4px; }
   header p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
+  /* ---- Tiles ---- */
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
     gap: 12px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
   }
   .tile {
     background: var(--surface-1);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 13px 15px;
   }
-  .tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
-  .tile .value {
-    font-size: 26px;
-    font-weight: 600;
-    font-variant-numeric: proportional-nums;
-  }
+  .tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
+  .tile .value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tile .value.sm { font-size: 17px; }
   .tile .value.critical { color: var(--status-critical); }
-  .tile .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .tile .value.warning  { color: var(--status-warning); }
+  .tile .value.good     { color: var(--status-good); }
+  .tile .sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-  .panel {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
+  /* ---- Abas ---- */
+  .abas {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--gridline);
+    margin-bottom: 14px;
+  }
+  .aba {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .aba:hover { color: var(--text-secondary); }
+  .aba[aria-selected="true"] {
+    color: var(--text-primary);
+    border-bottom-color: var(--series-1);
+  }
+  .aba .cont {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-left: 6px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
   }
 
+  /* ---- Filtros ---- */
   .filtros {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--gridline);
+    padding: 12px 14px;
     background: var(--surface-1);
     border-radius: 10px;
     border: 1px solid var(--border);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .filtros select, .filtros input {
     font: inherit;
@@ -85,163 +113,158 @@
     background: var(--page-plane);
     color: var(--text-primary);
   }
-  .filtros input[type="search"] { min-width: 200px; }
-
-  .top-praca-row {
-    display: grid;
-    grid-template-columns: 120px 1fr 34px;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 16px;
-    font-size: 13px;
-  }
-  .top-praca-row .barra-fundo {
-    background: var(--gridline);
-    border-radius: 4px;
-    height: 8px;
-    overflow: hidden;
-  }
-  .top-praca-row .barra {
-    background: var(--series-1);
-    height: 100%;
-    border-radius: 4px 0 0 4px;
-  }
-  .top-praca-row .contagem { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-
-  .secao-titulo {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    padding: 14px 16px 8px;
-  }
-
-  .estado-vazio, .estado-carregando, .estado-erro {
-    padding: 40px 16px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
-  .estado-erro { color: var(--status-critical); }
-
-  /* ---- Quadro (kanban) ---- */
-  .quadro {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
-    gap: 14px;
-    align-items: start;
-  }
-  @media (max-width: 860px) {
-    .quadro { grid-template-columns: 1fr; }
-  }
-
-  .coluna {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    max-height: 78vh;
-  }
-  .coluna-cabecalho {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--gridline);
-    font-size: 13px;
-    font-weight: 600;
-  }
-  .coluna-cabecalho .ponto {
-    width: 8px; height: 8px; border-radius: 50%;
-    flex: none;
-  }
-  .coluna-cabecalho .contagem-col {
-    margin-left: auto;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: var(--page-plane);
-    border-radius: 999px;
-    padding: 2px 9px;
-    font-variant-numeric: tabular-nums;
-  }
-  .coluna-corpo {
-    padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .cartao {
-    background: var(--page-plane);
-    border: 1px solid var(--border);
-    border-left-width: 4px;
-    border-left-style: solid;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  .cartao.nova { border-left-color: var(--status-critical); }
-  .cartao.andamento { border-left-color: var(--status-warning); }
-  .cartao.resolvida { border-left-color: var(--status-good); }
-
-  .cartao .praca {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-  .cartao .tipo {
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-  }
-  .cartao .linha-detalhe {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 10px;
-    color: var(--text-muted);
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-  .cartao .linha-detalhe b { color: var(--text-secondary); font-weight: 600; }
-
-  .cartao .rodape {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--gridline);
-  }
-  .cartao .tempo {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .cartao-acoes { display: flex; gap: 6px; }
-  .acao-btn {
+  .filtros input[type="search"] { min-width: 210px; flex: 1; max-width: 340px; }
+  .btn {
     font: inherit;
-    font-size: 11px;
-    padding: 5px 9px;
-    border-radius: 6px;
+    font-size: 13px;
+    padding: 7px 13px;
+    border-radius: 7px;
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
-    white-space: nowrap;
   }
-  .acao-btn:hover { border-color: var(--series-1); color: var(--series-1); }
-  .acao-btn.principal {
-    border-color: var(--series-1);
-    color: var(--series-1);
+  .btn:hover { border-color: var(--series-1); color: var(--series-1); }
+  .btn.limpar { margin-left: auto; }
+
+  .panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .coluna-vazia {
-    padding: 24px 10px;
-    text-align: center;
+  .estado-vazio, .estado-carregando, .estado-erro {
+    padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 13px;
+  }
+  .estado-erro { color: var(--status-critical); }
+
+  /* ---- Tabela da frota ---- */
+  table.frota { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.frota th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     color: var(--text-muted);
-    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gridline);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  table.frota th:hover { color: var(--text-secondary); }
+  table.frota th.num, table.frota td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.frota td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gridline);
+    color: var(--text-secondary);
+  }
+  table.frota tr:last-child td { border-bottom: none; }
+  table.frota tr:hover td { background: var(--surface-2); }
+  table.frota td.nome { color: var(--text-primary); font-weight: 600; }
+  table.frota td.mudo { color: var(--text-muted); }
+
+  /* Faixa lateral marcando a linha que precisa de ação — cor + texto, nunca cor sozinha */
+  tr.linha-critica td:first-child { box-shadow: inset 3px 0 0 var(--status-critical); }
+  tr.linha-atencao td:first-child { box-shadow: inset 3px 0 0 var(--status-warning); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .chip i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .chip.ok        { color: var(--status-good);     border-color: color-mix(in srgb, var(--status-good) 45%, transparent); }
+  .chip.ok i      { background: var(--status-good); }
+  .chip.atencao   { color: var(--status-warning);  border-color: color-mix(in srgb, var(--status-warning) 45%, transparent); }
+  .chip.atencao i { background: var(--status-warning); }
+  .chip.grave     { color: var(--status-critical); border-color: color-mix(in srgb, var(--status-critical) 45%, transparent); }
+  .chip.grave i   { background: var(--status-critical); }
+
+  /* ---- Kanban ---- */
+  .quadro { display: grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .quadro { grid-template-columns: 1fr; } }
+
+  .coluna {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 10px; display: flex; flex-direction: column; max-height: 76vh;
+  }
+  .coluna-cabecalho {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px; border-bottom: 1px solid var(--gridline);
+    font-size: 13px; font-weight: 600;
+  }
+  .coluna-cabecalho .ponto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .coluna-cabecalho .contagem-col {
+    margin-left: auto; font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    background: var(--page-plane); border-radius: 999px; padding: 2px 9px;
+    font-variant-numeric: tabular-nums;
+  }
+  .coluna-corpo { padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+  .cartao {
+    background: var(--page-plane); border: 1px solid var(--border);
+    border-left-width: 4px; border-left-style: solid;
+    border-radius: 8px; padding: 10px 12px; font-size: 13px;
+  }
+  .cartao.nova { border-left-color: var(--status-critical); }
+  .cartao.andamento { border-left-color: var(--status-warning); }
+  .cartao.resolvida { border-left-color: var(--status-good); }
+  .cartao.atrasada { background: color-mix(in srgb, var(--status-critical) 8%, var(--page-plane)); }
+
+  .cartao .topo { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
+  .cartao .praca { font-weight: 700; font-size: 14px; }
+  .cartao .tipo { color: var(--text-secondary); margin-bottom: 6px; }
+  .cartao .detalhe { color: var(--text-muted); font-size: 12px; line-height: 1.45; margin-bottom: 8px; }
+  .cartao .linha-detalhe {
+    display: flex; flex-wrap: wrap; gap: 4px 10px;
+    color: var(--text-muted); font-size: 12px; margin-bottom: 8px;
+  }
+  .cartao .linha-detalhe b { color: var(--text-secondary); font-weight: 600; }
+
+  .selo {
+    margin-left: auto; flex: none;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 999px; border: 1px solid; white-space: nowrap;
+  }
+  .selo.email     { color: var(--series-1);       border-color: color-mix(in srgb, var(--series-1) 45%, transparent); }
+  .selo.varredura { color: var(--series-2);       border-color: color-mix(in srgb, var(--series-2) 45%, transparent); }
+  .selo.ambas     { color: var(--status-serious); border-color: color-mix(in srgb, var(--status-serious) 45%, transparent); }
+
+  .sla {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 1px 7px; border-radius: 999px; margin-bottom: 6px;
+    color: var(--status-critical);
+    border: 1px solid color-mix(in srgb, var(--status-critical) 45%, transparent);
+  }
+
+  .cartao .rodape {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding-top: 8px; border-top: 1px solid var(--gridline);
+  }
+  .cartao .tempo { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .cartao .tempo .auto { color: var(--status-good); font-weight: 600; }
+
+  .cartao-acoes { display: flex; gap: 6px; }
+  .acao-btn {
+    font: inherit; font-size: 11px; padding: 5px 9px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+  }
+  .acao-btn:hover { border-color: var(--series-1); color: var(--series-1); }
+  .acao-btn.principal { border-color: var(--series-1); color: var(--series-1); }
+  .coluna-vazia { padding: 24px 10px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+  .rodape-info {
+    margin-top: 12px; font-size: 12px; color: var(--text-muted);
   }
 </style>
 </head>
@@ -249,198 +272,362 @@
 <div class="wrap">
   <header>
     <h1>Falhas de DVR</h1>
-    <p>Eventos de falha reportados pelos DVRs (perda de vídeo, HD, disco, rede) — atualizado automaticamente a partir da caixa de e-mail de alarmes.</p>
+    <p>Verificação direta nos aparelhos a cada rodada, somada aos alarmes por e-mail. O que volta a funcionar é encerrado automaticamente.</p>
   </header>
 
   <div class="tiles" id="tiles">
     <div class="tile"><div class="label">Carregando...</div><div class="value">—</div></div>
   </div>
 
-  <div class="panel" style="margin-bottom:16px;">
-    <div class="secao-titulo">Praças com mais falhas em aberto</div>
-    <div id="topPracas"></div>
+  <div class="abas" role="tablist">
+    <button class="aba" id="abaFrota" role="tab" aria-selected="true">Frota<span class="cont" id="contFrota">—</span></button>
+    <button class="aba" id="abaChamados" role="tab" aria-selected="false">Chamados<span class="cont" id="contChamados">—</span></button>
   </div>
 
   <div class="filtros">
-    <select id="fPraca"><option value="">Todas as praças</option></select>
+    <select id="fFilial"><option value="">Todas as filiais</option></select>
+    <select id="fPraca"><option value="">Todos os condomínios</option></select>
     <select id="fTipo"><option value="">Todos os tipos</option></select>
+    <select id="fSeveridade">
+      <option value="">Todas as severidades</option>
+      <option value="critica">Só críticas</option>
+      <option value="alta">Alta</option>
+      <option value="media">Média</option>
+    </select>
+    <select id="fOrigem">
+      <option value="">Todas as origens</option>
+      <option value="email">Só e-mail</option>
+      <option value="varredura">Só varredura</option>
+      <option value="ambas">Confirmadas pelas duas</option>
+    </select>
     <input type="search" id="fBusca" placeholder="Buscar por IP, canal ou câmera..." />
+    <button class="btn" id="btnExportar">Exportar CSV</button>
+    <button class="btn limpar" id="btnLimpar">Limpar filtros</button>
   </div>
 
-  <div id="quadroContainer">
-    <div class="estado-carregando">Carregando eventos...</div>
-  </div>
+  <div id="painelFrota"><div class="estado-carregando">Carregando frota...</div></div>
+  <div id="painelChamados" hidden></div>
+
+  <div class="rodape-info" id="rodapeInfo"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function () {
-  // --- Configuracao: troque pela URL e a chave ANON (publica) do seu projeto ---
+  // --- Configuracao ---------------------------------------------------------
   var SUPABASE_URL = "https://fxmdsumcqukxuzooiiju.supabase.co";
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4bWRzdW1jcXVreHV6b29paWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTcyNjAsImV4cCI6MjA4ODk5MzI2MH0.qEKKHqvJAt_5Bsk9V5uBI1eN27eWu1wiFhHoFbpI2lo";
+
+  // Horas sem alguém assumir o chamado antes de ele contar como atrasado.
+  var SLA_HORAS = 4;
+  // Minutos sem varrer antes de o aparelho contar como desatualizado.
+  var VARREDURA_ATRASADA_MIN = 150;
   // ------------------------------------------------------------------------
 
   var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  var todasFalhas = [];
+  var falhas = [];
+  var aparelhos = [];
+  var ultimaVarredura = null;
+  var abaAtiva = "frota";
+  var ordem = { campo: "prioridade", desc: true };
+
+  var STATUS_OCULTOS = ["arquivada"];
 
   var COLUNAS = [
-    { status: "aberta",       classe: "nova",       titulo: "Nova",         corPonto: "var(--status-critical)" },
-    { status: "em_andamento", classe: "andamento",  titulo: "Em andamento", corPonto: "var(--status-warning)" },
-    { status: "resolvida",    classe: "resolvida",  titulo: "Resolvida",    corPonto: "var(--status-good)" }
+    { status: "aberta",       classe: "nova",      titulo: "Nova",         cor: "var(--status-critical)" },
+    { status: "em_andamento", classe: "andamento", titulo: "Em andamento", cor: "var(--status-warning)" },
+    { status: "resolvida",    classe: "resolvida", titulo: "Resolvida",    cor: "var(--status-good)" }
   ];
 
-  var elTiles = document.getElementById("tiles");
-  var elTopPracas = document.getElementById("topPracas");
-  var elQuadro = document.getElementById("quadroContainer");
-  var elFPraca = document.getElementById("fPraca");
-  var elFTipo = document.getElementById("fTipo");
-  var elFBusca = document.getElementById("fBusca");
+  var ROTULO_ORIGEM = { email: "E-mail", varredura: "Varredura", ambas: "E-mail + varredura" };
+
+  var el = function (id) { return document.getElementById(id); };
+  var elTiles = el("tiles"), elFrota = el("painelFrota"), elChamados = el("painelChamados");
+  var elRodape = el("rodapeInfo");
+  var fFilial = el("fFilial"), fPraca = el("fPraca"), fTipo = el("fTipo");
+  var fSeveridade = el("fSeveridade"), fOrigem = el("fOrigem"), fBusca = el("fBusca");
 
   function escapeHtml(s) {
     if (s === null || s === undefined) return "";
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
-
   function formatarData(iso) {
     if (!iso) return "—";
     var d = new Date(iso);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    return isNaN(d.getTime()) ? "—" : d.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   }
-
-  function tempoDecorrido(iso) {
-    if (!iso) return "—";
+  function horasDesde(iso) {
+    if (!iso) return null;
     var d = new Date(iso);
-    if (isNaN(d.getTime())) return "—";
-    var diffMs = Date.now() - d.getTime();
-    var min = Math.floor(diffMs / 60000);
+    return isNaN(d.getTime()) ? null : (Date.now() - d.getTime()) / 3600000;
+  }
+  function tempoDecorrido(iso) {
+    var h = horasDesde(iso);
+    if (h === null) return "—";
+    var min = Math.floor(h * 60);
     if (min < 1) return "agora";
     if (min < 60) return "há " + min + " min";
-    var h = Math.floor(min / 60);
-    if (h < 24) return "há " + h + "h";
-    var dias = Math.floor(h / 24);
-    return "há " + dias + "d";
+    if (h < 24) return "há " + Math.floor(h) + "h";
+    return "há " + Math.floor(h / 24) + "d";
   }
 
-  async function carregar() {
-    var { data, error } = await supabase
-      .from("dvr_falhas")
-      .select("*")
-      .order("horario_alarme", { ascending: false, nullsFirst: false })
-      .limit(2000);
+  function visivel(f) { return STATUS_OCULTOS.indexOf(f.status) === -1; }
+  function emAberto(f) { return visivel(f) && f.status !== "resolvida"; }
+  function origemDe(f) { return f.origem || "email"; }
+  function atrasada(f) {
+    return f.status === "aberta" && (horasDesde(f.horario_alarme) || 0) >= SLA_HORAS;
+  }
 
-    if (error) {
-      elQuadro.innerHTML = '<div class="estado-erro">Erro ao carregar: ' + escapeHtml(error.message) + '</div>';
-      elTiles.innerHTML = '<div class="tile"><div class="label">Erro</div><div class="value critical">—</div></div>';
+  // --- Carga ----------------------------------------------------------------
+  async function carregar() {
+    var rFalhas = await supabase.from("dvr_falhas").select("*")
+      .not("status", "in", "(" + STATUS_OCULTOS.join(",") + ")")
+      .order("horario_alarme", { ascending: false, nullsFirst: false })
+      .limit(5000);
+
+    if (rFalhas.error) {
+      elFrota.innerHTML = '<div class="estado-erro">Erro ao carregar: ' + escapeHtml(rFalhas.error.message) + '</div>';
       return;
     }
+    falhas = (rFalhas.data || []).filter(visivel);
 
-    todasFalhas = data || [];
+    var rAp = await supabase.from("dvr_aparelhos").select("*").limit(2000);
+    aparelhos = (!rAp.error && rAp.data) ? rAp.data : [];
+
+    var rVar = await supabase.from("dvr_varreduras").select("*")
+      .order("executado_em", { ascending: false }).limit(1);
+    ultimaVarredura = (!rVar.error && rVar.data && rVar.data[0]) ? rVar.data[0] : null;
+
     popularFiltros();
-    renderTudo();
+    render();
+  }
+
+  function unicos(lista, chave) {
+    return Array.from(new Set(lista.map(function (x) { return x[chave]; }).filter(Boolean))).sort();
   }
 
   function popularFiltros() {
-    var pracaAtual = elFPraca.value, tipoAtual = elFTipo.value;
-    var pracas = Array.from(new Set(todasFalhas.map(function (f) { return f.dispositivo; }).filter(Boolean))).sort();
-    var tipos = Array.from(new Set(todasFalhas.map(function (f) { return f.tipo_falha; }).filter(Boolean))).sort();
+    var manter = { filial: fFilial.value, praca: fPraca.value, tipo: fTipo.value };
 
-    elFPraca.innerHTML = '<option value="">Todas as praças</option>' +
-      pracas.map(function (p) { return '<option value="' + escapeHtml(p) + '">' + escapeHtml(p) + '</option>'; }).join("");
-    elFTipo.innerHTML = '<option value="">Todos os tipos</option>' +
-      tipos.map(function (t) { return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join("");
+    var filiais = Array.from(new Set(
+      unicos(aparelhos, "filial").concat(unicos(falhas, "filial"))
+    )).sort();
+    var pracas = Array.from(new Set(
+      unicos(aparelhos, "nome").concat(unicos(falhas, "dispositivo"))
+    )).sort();
+    var tipos = unicos(falhas, "tipo_falha");
 
-    elFPraca.value = pracaAtual;
-    elFTipo.value = tipoAtual;
+    function preencher(sel, itens, rotuloTodos) {
+      sel.innerHTML = '<option value="">' + rotuloTodos + '</option>' + itens.map(function (i) {
+        return '<option value="' + escapeHtml(i) + '">' + escapeHtml(i) + '</option>';
+      }).join("");
+    }
+    preencher(fFilial, filiais, "Todas as filiais");
+    preencher(fPraca, pracas, "Todos os condomínios");
+    preencher(fTipo, tipos, "Todos os tipos");
+
+    fFilial.value = manter.filial; fPraca.value = manter.praca; fTipo.value = manter.tipo;
   }
 
-  function filtrar() {
-    var praca = elFPraca.value, tipo = elFTipo.value;
-    var busca = elFBusca.value.trim().toLowerCase();
+  // --- Filtros --------------------------------------------------------------
+  function falhasFiltradas() {
+    var filial = fFilial.value, praca = fPraca.value, tipo = fTipo.value;
+    var sev = fSeveridade.value, origem = fOrigem.value;
+    var busca = fBusca.value.trim().toLowerCase();
 
-    return todasFalhas.filter(function (f) {
+    return falhas.filter(function (f) {
+      if (filial && f.filial !== filial) return false;
       if (praca && f.dispositivo !== praca) return false;
       if (tipo && f.tipo_falha !== tipo) return false;
+      if (sev && f.severidade !== sev) return false;
+      if (origem && origemDe(f) !== origem) return false;
       if (busca) {
-        var alvo = [f.ip_dvr, f.canal, f.nome_camera].join(" ").toLowerCase();
+        var alvo = [f.ip_dvr, f.canal, f.nome_camera, f.detalhe, f.dispositivo].join(" ").toLowerCase();
         if (alvo.indexOf(busca) === -1) return false;
       }
       return true;
     });
   }
 
-  function renderTiles() {
-    var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    var abertas = todasFalhas.filter(function (f) { return f.status !== "resolvida"; });
-    var hojeCount = todasFalhas.filter(function (f) {
-      if (!f.horario_alarme) return false;
-      return new Date(f.horario_alarme) >= hoje;
-    }).length;
+  function frotaFiltrada() {
+    var filial = fFilial.value, praca = fPraca.value;
+    var busca = fBusca.value.trim().toLowerCase();
 
-    var contagemPorPraca = {};
-    abertas.forEach(function (f) {
-      var k = f.dispositivo || "(sem praça)";
-      contagemPorPraca[k] = (contagemPorPraca[k] || 0) + 1;
+    var abertasPorDvr = {};
+    var criticasPorDvr = {};
+    falhas.filter(emAberto).forEach(function (f) {
+      var k = f.dispositivo || "";
+      abertasPorDvr[k] = (abertasPorDvr[k] || 0) + 1;
+      if (f.severidade === "critica") criticasPorDvr[k] = (criticasPorDvr[k] || 0) + 1;
     });
-    var top = Object.keys(contagemPorPraca).sort(function (a, b) { return contagemPorPraca[b] - contagemPorPraca[a]; })[0];
 
-    elTiles.innerHTML =
-      '<div class="tile"><div class="label">Falhas em aberto</div><div class="value ' + (abertas.length ? "critical" : "") + '">' + abertas.length + '</div></div>' +
-      '<div class="tile"><div class="label">Eventos hoje</div><div class="value">' + hojeCount + '</div></div>' +
-      '<div class="tile"><div class="label">Praça mais afetada</div><div class="value" style="font-size:18px;">' + escapeHtml(top || "—") + '</div><div class="sub">' + (top ? contagemPorPraca[top] + " em aberto" : "") + '</div></div>' +
-      '<div class="tile"><div class="label">Total no histórico</div><div class="value">' + todasFalhas.length + '</div></div>';
+    return aparelhos.filter(function (a) {
+      if (filial && a.filial !== filial) return false;
+      if (praca && a.nome !== praca) return false;
+      if (busca) {
+        var alvo = [a.nome, a.ip_dvr, a.filial, a.modelo].join(" ").toLowerCase();
+        if (alvo.indexOf(busca) === -1) return false;
+      }
+      return true;
+    }).map(function (a) {
+      var min = (horasDesde(a.ultima_varredura) || 0) * 60;
+      return {
+        dvr: a,
+        abertas: abertasPorDvr[a.nome] || 0,
+        criticas: criticasPorDvr[a.nome] || 0,
+        minSemVarrer: min,
+        desatualizado: min > VARREDURA_ATRASADA_MIN
+      };
+    });
   }
 
-  function renderTopPracas() {
-    var abertas = todasFalhas.filter(function (f) { return f.status !== "resolvida"; });
-    var contagem = {};
-    abertas.forEach(function (f) {
-      var k = f.dispositivo || "(sem praça)";
-      contagem[k] = (contagem[k] || 0) + 1;
+  function ordenarFrota(linhas) {
+    var c = ordem.campo, dir = ordem.desc ? -1 : 1;
+    return linhas.slice().sort(function (x, y) {
+      function val(l) {
+        if (c === "nome") return (l.dvr.nome || "").toLowerCase();
+        if (c === "filial") return (l.dvr.filial || "").toLowerCase();
+        if (c === "canais") return l.dvr.canais_verificados || 0;
+        if (c === "abertas") return l.abertas;
+        if (c === "varredura") return l.minSemVarrer;
+        // prioridade: inacessível > crítica > falha > desatualizado > ok
+        var p = 0;
+        if (l.dvr.acessivel === false) p += 10000;
+        p += l.criticas * 100 + l.abertas;
+        if (l.desatualizado) p += 50;
+        return p;
+      }
+      var a = val(x), b = val(y);
+      if (a === b) return (x.dvr.nome || "").localeCompare(y.dvr.nome || "");
+      return a > b ? dir : -dir;
     });
-    var entradas = Object.keys(contagem).map(function (k) { return [k, contagem[k]]; })
-      .sort(function (a, b) { return b[1] - a[1]; })
-      .slice(0, 6);
+  }
 
-    if (!entradas.length) {
-      elTopPracas.innerHTML = '<div class="estado-vazio">Nenhuma falha em aberto no momento.</div>';
+  // --- Tiles ----------------------------------------------------------------
+  function renderTiles() {
+    var abertas = falhas.filter(emAberto);
+    var criticas = abertas.filter(function (f) { return f.severidade === "critica"; });
+    var atrasadas = abertas.filter(atrasada);
+    var inacessiveis = aparelhos.filter(function (a) { return a.acessivel === false; });
+    var desatualizados = aparelhos.filter(function (a) {
+      return (horasDesde(a.ultima_varredura) || 0) * 60 > VARREDURA_ATRASADA_MIN;
+    });
+
+    var tileVarredura = ultimaVarredura
+      ? '<div class="tile"><div class="label">Última varredura</div>' +
+        '<div class="value sm" title="' + formatarData(ultimaVarredura.executado_em) + '">' +
+        escapeHtml(tempoDecorrido(ultimaVarredura.executado_em)) + '</div>' +
+        '<div class="sub">modo ' + escapeHtml(ultimaVarredura.modo || "—") +
+        ' · ' + (ultimaVarredura.fechadas || 0) + ' fechada(s)</div></div>'
+      : '<div class="tile"><div class="label">Última varredura</div>' +
+        '<div class="value sm" style="color:var(--text-muted)">—</div>' +
+        '<div class="sub">coletor ainda não executou</div></div>';
+
+    elTiles.innerHTML =
+      '<div class="tile"><div class="label">Falhas em aberto</div><div class="value ' +
+        (abertas.length ? "critical" : "good") + '">' + abertas.length + '</div></div>' +
+      '<div class="tile"><div class="label">Críticas</div><div class="value ' +
+        (criticas.length ? "critical" : "good") + '">' + criticas.length + '</div></div>' +
+      '<div class="tile"><div class="label">Sem atendimento</div><div class="value ' +
+        (atrasadas.length ? "warning" : "good") + '">' + atrasadas.length + '</div>' +
+        '<div class="sub">abertas há mais de ' + SLA_HORAS + 'h</div></div>' +
+      '<div class="tile"><div class="label">DVRs monitorados</div><div class="value">' +
+        aparelhos.length + '</div></div>' +
+      '<div class="tile"><div class="label">DVRs sem resposta</div><div class="value ' +
+        (inacessiveis.length ? "critical" : "good") + '">' + inacessiveis.length + '</div></div>' +
+      '<div class="tile"><div class="label">Sem varrer</div><div class="value ' +
+        (desatualizados.length ? "warning" : "good") + '">' + desatualizados.length + '</div>' +
+        '<div class="sub">há mais de ' + Math.round(VARREDURA_ATRASADA_MIN / 60) + 'h</div></div>' +
+      tileVarredura;
+  }
+
+  // --- Aba Frota ------------------------------------------------------------
+  var COLS_FROTA = [
+    { campo: "nome",      titulo: "Condomínio" },
+    { campo: "filial",    titulo: "Filial" },
+    { campo: null,        titulo: "IP" },
+    { campo: null,        titulo: "Situação" },
+    { campo: "canais",    titulo: "Canais", num: true },
+    { campo: "abertas",   titulo: "Falhas", num: true },
+    { campo: "varredura", titulo: "Última varredura", num: true }
+  ];
+
+  function situacaoDe(l) {
+    if (l.dvr.acessivel === false) return { classe: "grave", texto: "Sem resposta", linha: "linha-critica" };
+    if (l.criticas > 0) return { classe: "grave", texto: l.criticas + " crítica(s)", linha: "linha-critica" };
+    if (l.desatualizado) return { classe: "atencao", texto: "Sem varrer", linha: "linha-atencao" };
+    if (l.abertas > 0) return { classe: "atencao", texto: "Com falha", linha: "linha-atencao" };
+    return { classe: "ok", texto: "Normal", linha: "" };
+  }
+
+  function renderFrota() {
+    var linhas = ordenarFrota(frotaFiltrada());
+    el("contFrota").textContent = linhas.length;
+
+    if (!aparelhos.length) {
+      elFrota.innerHTML = '<div class="panel"><div class="estado-vazio">' +
+        'Nenhum aparelho registrado ainda. Rode <b>sql/04-aparelhos.sql</b> no Supabase e ' +
+        'aguarde a próxima varredura.</div></div>';
+      return;
+    }
+    if (!linhas.length) {
+      elFrota.innerHTML = '<div class="panel"><div class="estado-vazio">Nenhum aparelho com esses filtros.</div></div>';
       return;
     }
 
-    var max = entradas[0][1];
-    elTopPracas.innerHTML = entradas.map(function (e) {
-      var pct = Math.max(6, Math.round((e[1] / max) * 100));
-      return '<div class="top-praca-row">' +
-        '<div>' + escapeHtml(e[0]) + '</div>' +
-        '<div class="barra-fundo"><div class="barra" style="width:' + pct + '%"></div></div>' +
-        '<div class="contagem">' + e[1] + '</div>' +
-        '</div>';
+    var cab = COLS_FROTA.map(function (c) {
+      var seta = (c.campo && ordem.campo === c.campo) ? (ordem.desc ? " ↓" : " ↑") : "";
+      return '<th class="' + (c.num ? "num" : "") + '"' +
+             (c.campo ? ' data-ordenar="' + c.campo + '"' : '') + '>' +
+             escapeHtml(c.titulo) + seta + '</th>';
     }).join("");
+
+    var corpo = linhas.map(function (l) {
+      var s = situacaoDe(l);
+      var d = l.dvr;
+      return '<tr class="' + s.linha + '">' +
+        '<td class="nome">' + escapeHtml(d.nome || "(sem nome)") + '</td>' +
+        '<td>' + escapeHtml(d.filial || "—") + '</td>' +
+        '<td class="mudo">' + escapeHtml(d.ip_dvr || "—") + '</td>' +
+        '<td><span class="chip ' + s.classe + '"><i></i>' + escapeHtml(s.texto) + '</span>' +
+          (d.acessivel === false && d.motivo
+            ? '<div class="mudo" style="font-size:11px;margin-top:3px">' + escapeHtml(d.motivo) + '</div>' : '') +
+        '</td>' +
+        '<td class="num">' + (d.canais_verificados != null ? d.canais_verificados : "—") + '</td>' +
+        '<td class="num">' + (l.abertas || "—") + '</td>' +
+        '<td class="num" title="' + formatarData(d.ultima_varredura) + '">' +
+          escapeHtml(tempoDecorrido(d.ultima_varredura)) + '</td>' +
+      '</tr>';
+    }).join("");
+
+    elFrota.innerHTML = '<div class="panel"><table class="frota"><thead><tr>' + cab +
+      '</tr></thead><tbody>' + corpo + '</tbody></table></div>';
+
+    Array.prototype.forEach.call(elFrota.querySelectorAll("th[data-ordenar]"), function (th) {
+      th.addEventListener("click", function () {
+        var campo = th.getAttribute("data-ordenar");
+        if (ordem.campo === campo) ordem.desc = !ordem.desc;
+        else { ordem.campo = campo; ordem.desc = true; }
+        renderFrota();
+      });
+    });
   }
 
-  // Qual botão(ões) aparecem em cada coluna, e pra qual status cada um move o cartão
+  // --- Aba Chamados ---------------------------------------------------------
   function acoesPara(status) {
-    if (status === "aberta") {
-      return [{ rotulo: "Iniciar atendimento", novoStatus: "em_andamento", principal: true }];
-    }
-    if (status === "em_andamento") {
-      return [
-        { rotulo: "Marcar resolvida", novoStatus: "resolvida", principal: true },
-        { rotulo: "Voltar pra Nova", novoStatus: "aberta", principal: false }
-      ];
-    }
-    // resolvida
+    if (status === "aberta") return [{ rotulo: "Iniciar atendimento", novoStatus: "em_andamento", principal: true }];
+    if (status === "em_andamento") return [
+      { rotulo: "Marcar resolvida", novoStatus: "resolvida", principal: true },
+      { rotulo: "Voltar pra Nova", novoStatus: "aberta", principal: false }
+    ];
     return [{ rotulo: "Reabrir", novoStatus: "aberta", principal: false }];
   }
 
   function cartaoHtml(f, classeColuna) {
-    var acoes = acoesPara(f.status);
-    var botoes = acoes.map(function (a) {
-      return '<button class="acao-btn' + (a.principal ? ' principal' : '') + '" data-id="' + f.id + '" data-novo-status="' + a.novoStatus + '">' + a.rotulo + '</button>';
+    var botoes = acoesPara(f.status).map(function (a) {
+      return '<button class="acao-btn' + (a.principal ? ' principal' : '') +
+        '" data-id="' + f.id + '" data-novo-status="' + a.novoStatus + '">' + a.rotulo + '</button>';
     }).join("");
 
     var detalhes = [];
@@ -448,39 +635,51 @@
     if (f.nome_camera) detalhes.push('<span><b>Câmera</b> ' + escapeHtml(f.nome_camera) + '</span>');
     if (f.ip_dvr) detalhes.push('<span><b>IP</b> ' + escapeHtml(f.ip_dvr) + '</span>');
 
-    return '<div class="cartao ' + classeColuna + '">' +
-      '<div class="praca">' + escapeHtml(f.dispositivo || "(sem praça)") + '</div>' +
+    var origem = origemDe(f);
+    var selo = '<span class="selo ' + origem + '">' + escapeHtml(ROTULO_ORIGEM[origem] || origem) + '</span>';
+
+    var h = horasDesde(f.horario_alarme);
+    var slaBadge = atrasada(f)
+      ? '<div class="sla">⏰ sem atendimento há ' + Math.floor(h) + 'h</div>' : '';
+
+    var marcaAuto = f.resolvido_por === "varredura" ? ' · <span class="auto">fechada pela varredura</span>' : '';
+    var visto = f.visto_em ? ' · confirmada ' + escapeHtml(tempoDecorrido(f.visto_em)) : '';
+
+    return '<div class="cartao ' + classeColuna + (atrasada(f) ? ' atrasada' : '') + '">' +
+      '<div class="topo"><div class="praca">' + escapeHtml(f.dispositivo || "(sem praça)") + '</div>' + selo + '</div>' +
+      (f.filial ? '<div class="mudo" style="font-size:11px;color:var(--text-muted)">' + escapeHtml(f.filial) + '</div>' : '') +
+      slaBadge +
       '<div class="tipo">' + escapeHtml(f.tipo_falha) + '</div>' +
+      (f.detalhe ? '<div class="detalhe">' + escapeHtml(f.detalhe) + '</div>' : '') +
       (detalhes.length ? '<div class="linha-detalhe">' + detalhes.join("") + '</div>' : '') +
-      '<div class="rodape">' +
-        '<span class="tempo" title="' + formatarData(f.horario_alarme) + '">' + tempoDecorrido(f.horario_alarme) + '</span>' +
-        '<div class="cartao-acoes">' + botoes + '</div>' +
-      '</div>' +
-      '</div>';
+      '<div class="rodape"><span class="tempo" title="' + formatarData(f.horario_alarme) + '">' +
+        tempoDecorrido(f.horario_alarme) + visto + marcaAuto + '</span>' +
+        '<div class="cartao-acoes">' + botoes + '</div></div>' +
+    '</div>';
   }
 
-  function renderQuadro() {
-    var lista = filtrar();
+  function renderChamados() {
+    var lista = falhasFiltradas();
+    el("contChamados").textContent = lista.filter(emAberto).length;
 
-    var html = '<div class="quadro">' + COLUNAS.map(function (col) {
-      var itens = lista.filter(function (f) { return f.status === col.status; });
+    // Mais antigos primeiro em Nova: a fila de atendimento é por idade, não por chegada.
+    var ordenada = lista.slice().sort(function (a, b) {
+      return new Date(a.horario_alarme || 0) - new Date(b.horario_alarme || 0);
+    });
+
+    elChamados.innerHTML = '<div class="quadro">' + COLUNAS.map(function (col) {
+      var itens = ordenada.filter(function (f) { return f.status === col.status; });
+      if (col.status === "resolvida") itens = itens.reverse().slice(0, 100);
       var corpo = itens.length
         ? itens.map(function (f) { return cartaoHtml(f, col.classe); }).join("")
         : '<div class="coluna-vazia">Nenhum evento aqui.</div>';
-
-      return '<div class="coluna">' +
-        '<div class="coluna-cabecalho">' +
-          '<span class="ponto" style="background:' + col.corPonto + '"></span>' +
-          col.titulo +
-          '<span class="contagem-col">' + itens.length + '</span>' +
-        '</div>' +
-        '<div class="coluna-corpo">' + corpo + '</div>' +
-      '</div>';
+      return '<div class="coluna"><div class="coluna-cabecalho">' +
+        '<span class="ponto" style="background:' + col.cor + '"></span>' + col.titulo +
+        '<span class="contagem-col">' + itens.length + '</span></div>' +
+        '<div class="coluna-corpo">' + corpo + '</div></div>';
     }).join("") + '</div>';
 
-    elQuadro.innerHTML = html;
-
-    Array.prototype.forEach.call(elQuadro.querySelectorAll(".acao-btn"), function (btn) {
+    Array.prototype.forEach.call(elChamados.querySelectorAll(".acao-btn"), function (btn) {
       btn.addEventListener("click", async function () {
         var id = btn.getAttribute("data-id");
         var novoStatus = btn.getAttribute("data-novo-status");
@@ -488,31 +687,98 @@
         if (cartao) cartao.style.opacity = "0.5";
         Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = true; });
 
-        var { error } = await supabase.from("dvr_falhas").update({ status: novoStatus }).eq("id", id);
-        if (error) {
-          alert("Não consegui atualizar: " + error.message);
+        var r = await supabase.from("dvr_falhas")
+          .update({ status: novoStatus, resolvido_por: null }).eq("id", id);
+
+        if (r.error) {
+          alert("Não consegui atualizar: " + r.error.message);
           if (cartao) cartao.style.opacity = "1";
           Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = false; });
           return;
         }
-        var item = todasFalhas.find(function (f) { return String(f.id) === String(id); });
-        if (item) item.status = novoStatus;
-        renderTudo();
+        var item = falhas.find(function (f) { return String(f.id) === String(id); });
+        if (item) { item.status = novoStatus; item.resolvido_por = null; }
+        render();
       });
     });
   }
 
-  function renderTudo() {
-    renderTiles();
-    renderTopPracas();
-    renderQuadro();
+  // --- Exportar -------------------------------------------------------------
+  function baixarCsv(nome, cabecalho, linhas) {
+    var esc = function (v) {
+      var s = (v === null || v === undefined) ? "" : String(v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    var csv = [cabecalho.map(esc).join(";")]
+      .concat(linhas.map(function (l) { return l.map(esc).join(";"); })).join("\r\n");
+    // BOM para o Excel em pt-BR reconhecer os acentos
+    var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nome;
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
-  [elFPraca, elFTipo].forEach(function (el) { el.addEventListener("change", renderQuadro); });
-  elFBusca.addEventListener("input", renderQuadro);
+  function exportar() {
+    var hoje = new Date().toISOString().slice(0, 10);
+    if (abaAtiva === "frota") {
+      var linhas = ordenarFrota(frotaFiltrada()).map(function (l) {
+        return [l.dvr.nome, l.dvr.filial, l.dvr.ip_dvr, situacaoDe(l).texto,
+                l.dvr.canais_verificados, l.abertas, l.criticas,
+                formatarData(l.dvr.ultima_varredura), l.dvr.motivo || ""];
+      });
+      baixarCsv("frota-dvr-" + hoje + ".csv",
+        ["Condomínio", "Filial", "IP", "Situação", "Canais", "Falhas abertas",
+         "Críticas", "Última varredura", "Motivo"], linhas);
+    } else {
+      var l2 = falhasFiltradas().map(function (f) {
+        return [f.dispositivo, f.filial, f.ip_dvr, f.canal, f.nome_camera, f.tipo_falha,
+                f.severidade, f.status, ROTULO_ORIGEM[origemDe(f)], f.detalhe,
+                formatarData(f.horario_alarme), f.resolvido_por || ""];
+      });
+      baixarCsv("chamados-dvr-" + hoje + ".csv",
+        ["Condomínio", "Filial", "IP", "Canal", "Câmera", "Tipo", "Severidade",
+         "Status", "Origem", "Detalhe", "Aberta em", "Resolvido por"], l2);
+    }
+  }
+
+  // --- Render + eventos -----------------------------------------------------
+  function render() {
+    renderTiles();
+    if (abaAtiva === "frota") renderFrota(); else renderChamados();
+    el("contFrota").textContent = frotaFiltrada().length;
+    el("contChamados").textContent = falhasFiltradas().filter(emAberto).length;
+    elRodape.textContent = "Atualiza sozinho a cada 5 minutos. " +
+      aparelhos.length + " aparelho(s) monitorado(s), " +
+      falhas.filter(emAberto).length + " falha(s) em aberto.";
+  }
+
+  function trocarAba(qual) {
+    abaAtiva = qual;
+    el("abaFrota").setAttribute("aria-selected", String(qual === "frota"));
+    el("abaChamados").setAttribute("aria-selected", String(qual === "chamados"));
+    elFrota.hidden = qual !== "frota";
+    elChamados.hidden = qual !== "chamados";
+    render();
+  }
+
+  el("abaFrota").addEventListener("click", function () { trocarAba("frota"); });
+  el("abaChamados").addEventListener("click", function () { trocarAba("chamados"); });
+  el("btnExportar").addEventListener("click", exportar);
+  el("btnLimpar").addEventListener("click", function () {
+    [fFilial, fPraca, fTipo, fSeveridade, fOrigem].forEach(function (s) { s.value = ""; });
+    fBusca.value = "";
+    render();
+  });
+
+  [fFilial, fPraca, fTipo, fSeveridade, fOrigem].forEach(function (s) {
+    s.addEventListener("change", render);
+  });
+  fBusca.addEventListener("input", render);
 
   carregar();
-  setInterval(carregar, 5 * 60 * 1000); // re-busca a cada 5 min
+  setInterval(carregar, 5 * 60 * 1000);
 })();
 </script>
 </body>
