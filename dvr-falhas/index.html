@@ -126,6 +126,53 @@
   }
   .btn:hover { border-color: var(--series-1); color: var(--series-1); }
   .btn.limpar { margin-left: auto; }
+  .opcao {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none;
+  }
+  .opcao input { accent-color: var(--series-1); width: 15px; height: 15px; }
+
+  /* ---- Card agrupado ---- */
+  .resumo-sev { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .pill {
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 999px; border: 1px solid; white-space: nowrap;
+  }
+  .pill.critica { color: var(--status-critical); border-color: color-mix(in srgb, var(--status-critical) 45%, transparent); }
+  .pill.alta    { color: var(--status-serious);  border-color: color-mix(in srgb, var(--status-serious) 45%, transparent); }
+  .pill.media   { color: var(--status-warning);  border-color: color-mix(in srgb, var(--status-warning) 45%, transparent); }
+
+  ul.itens-grupo {
+    list-style: none; margin: 0 0 8px; padding: 0;
+    font-size: 12.5px; color: var(--text-secondary); line-height: 1.55;
+  }
+  ul.itens-grupo li { display: flex; gap: 7px; align-items: baseline; }
+  ul.itens-grupo li .pt { flex: none; width: 6px; height: 6px; border-radius: 50%; }
+  ul.itens-grupo li .pt.critica { background: var(--status-critical); }
+  ul.itens-grupo li .pt.alta    { background: var(--status-serious); }
+  ul.itens-grupo li .pt.media   { background: var(--status-warning); }
+  ul.itens-grupo li .mais { color: var(--text-muted); font-style: italic; }
+
+  /* ---- Lista de itens no painel ---- */
+  .lista-sel { display: flex; flex-direction: column; gap: 2px; }
+  .item-sel {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 9px 11px; border-radius: 8px; cursor: pointer;
+    background: var(--page-plane); border: 1px solid var(--border);
+  }
+  .item-sel:hover { border-color: color-mix(in srgb, var(--series-1) 45%, var(--border)); }
+  .item-sel input { margin-top: 2px; accent-color: var(--series-1); width: 15px; height: 15px; flex: none; }
+  .item-sel .txt { font-size: 13px; display: flex; flex-direction: column; gap: 1px; }
+  .item-sel .txt .tt { color: var(--text-primary); font-weight: 600; }
+  .item-sel .txt .dd { color: var(--text-muted); font-size: 12px; line-height: 1.4; }
+  .barra-sel {
+    display: flex; gap: 12px; align-items: center;
+    font-size: 12px; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .link-sel {
+    background: none; border: none; padding: 0; cursor: pointer;
+    color: var(--series-1); font: inherit; font-size: 12px;
+  }
 
   .panel {
     background: var(--surface-1);
@@ -253,19 +300,96 @@
   .cartao .tempo { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
   .cartao .tempo .auto { color: var(--status-good); font-weight: 600; }
 
-  .cartao-acoes { display: flex; gap: 6px; }
-  .acao-btn {
-    font: inherit; font-size: 11px; padding: 5px 9px; border-radius: 6px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-secondary); cursor: pointer; white-space: nowrap;
-  }
-  .acao-btn:hover { border-color: var(--series-1); color: var(--series-1); }
-  .acao-btn.principal { border-color: var(--series-1); color: var(--series-1); }
   .coluna-vazia { padding: 24px 10px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   .rodape-info {
     margin-top: 12px; font-size: 12px; color: var(--text-muted);
   }
+
+  /* ---- Painel de detalhe ---- */
+  .fundo-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 40px 16px; overflow-y: auto; z-index: 50;
+  }
+  .modal {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; width: 100%; max-width: 620px;
+  }
+  .modal-cab {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 18px 20px 14px; border-bottom: 1px solid var(--gridline);
+  }
+  .modal-cab h2 { margin: 0 0 2px; font-size: 18px; }
+  .modal-cab .sub { font-size: 13px; color: var(--text-secondary); }
+  .fechar {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 22px; line-height: 1; padding: 0 4px;
+  }
+  .fechar:hover { color: var(--text-primary); }
+
+  .modal-corpo { padding: 16px 20px; }
+  .modal-secao { margin-bottom: 20px; }
+  .modal-secao > h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted); margin: 0 0 8px; font-weight: 600;
+  }
+  .campos {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px 16px; font-size: 13px;
+  }
+  .campo .rot { font-size: 11px; color: var(--text-muted); margin-bottom: 1px; }
+  .campo .val { color: var(--text-primary); }
+
+  .detalhe-box {
+    background: var(--page-plane); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 13px; font-size: 13px;
+    color: var(--text-secondary); line-height: 1.5;
+  }
+
+  .historico {
+    background: var(--page-plane); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 13px; font-size: 12.5px;
+    color: var(--text-secondary); line-height: 1.6;
+    white-space: pre-wrap; max-height: 180px; overflow-y: auto;
+  }
+
+  .modal label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .modal input[type="text"], .modal textarea {
+    width: 100%; font: inherit; font-size: 13px;
+    padding: 9px 11px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--page-plane); color: var(--text-primary);
+    resize: vertical;
+  }
+  .modal textarea { min-height: 84px; }
+  .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--series-1); }
+  .ajuda { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
+  .erro-campo { color: var(--status-critical); font-size: 12px; margin-top: 8px; }
+
+  .modal-rodape {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 14px 20px; border-top: 1px solid var(--gridline);
+  }
+  .btn-acao {
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 9px 15px; border-radius: 7px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+  }
+  .btn-acao:hover { border-color: var(--series-1); color: var(--series-1); }
+  .btn-acao.primario {
+    background: var(--series-1); border-color: var(--series-1); color: #fff;
+  }
+  .btn-acao.primario:hover { filter: brightness(1.1); color: #fff; }
+  .btn-acao.resolver {
+    background: var(--status-good); border-color: var(--status-good); color: #fff;
+  }
+  .btn-acao.resolver:hover { filter: brightness(1.1); color: #fff; }
+  .btn-acao:disabled { opacity: 0.5; cursor: default; }
+  .btn-acao.ao-lado { margin-left: auto; }
+
+  .cartao { cursor: pointer; }
+  .cartao:hover { border-color: color-mix(in srgb, var(--series-1) 50%, var(--border)); }
+  .marca-nota { color: var(--text-muted); font-size: 11px; }
 </style>
 </head>
 <body>
@@ -301,6 +425,7 @@
       <option value="ambas">Confirmadas pelas duas</option>
     </select>
     <input type="search" id="fBusca" placeholder="Buscar por IP, canal ou câmera..." />
+    <label class="opcao"><input type="checkbox" id="fAgrupar" checked /> Agrupar por condomínio</label>
     <button class="btn" id="btnExportar">Exportar CSV</button>
     <button class="btn limpar" id="btnLimpar">Limpar filtros</button>
   </div>
@@ -310,6 +435,8 @@
 
   <div class="rodape-info" id="rodapeInfo"></div>
 </div>
+
+<div id="modal"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -615,21 +742,7 @@
   }
 
   // --- Aba Chamados ---------------------------------------------------------
-  function acoesPara(status) {
-    if (status === "aberta") return [{ rotulo: "Iniciar atendimento", novoStatus: "em_andamento", principal: true }];
-    if (status === "em_andamento") return [
-      { rotulo: "Marcar resolvida", novoStatus: "resolvida", principal: true },
-      { rotulo: "Voltar pra Nova", novoStatus: "aberta", principal: false }
-    ];
-    return [{ rotulo: "Reabrir", novoStatus: "aberta", principal: false }];
-  }
-
   function cartaoHtml(f, classeColuna) {
-    var botoes = acoesPara(f.status).map(function (a) {
-      return '<button class="acao-btn' + (a.principal ? ' principal' : '') +
-        '" data-id="' + f.id + '" data-novo-status="' + a.novoStatus + '">' + a.rotulo + '</button>';
-    }).join("");
-
     var detalhes = [];
     if (f.canal) detalhes.push('<span><b>Canal</b> ' + escapeHtml(f.canal) + '</span>');
     if (f.nome_camera) detalhes.push('<span><b>Câmera</b> ' + escapeHtml(f.nome_camera) + '</span>');
@@ -645,7 +758,13 @@
     var marcaAuto = f.resolvido_por === "varredura" ? ' · <span class="auto">fechada pela varredura</span>' : '';
     var visto = f.visto_em ? ' · confirmada ' + escapeHtml(tempoDecorrido(f.visto_em)) : '';
 
-    return '<div class="cartao ' + classeColuna + (atrasada(f) ? ' atrasada' : '') + '">' +
+    var rodapeDir = f.atendido_por
+      ? '<span class="marca-nota">' + escapeHtml(f.atendido_por) +
+        (f.observacao ? ' · 📝' : '') + '</span>'
+      : '<span class="marca-nota">abrir ›</span>';
+
+    return '<div class="cartao ' + classeColuna + (atrasada(f) ? ' atrasada' : '') +
+      '" data-id="' + f.id + '" role="button" tabindex="0">' +
       '<div class="topo"><div class="praca">' + escapeHtml(f.dispositivo || "(sem praça)") + '</div>' + selo + '</div>' +
       (f.filial ? '<div class="mudo" style="font-size:11px;color:var(--text-muted)">' + escapeHtml(f.filial) + '</div>' : '') +
       slaBadge +
@@ -654,53 +773,344 @@
       (detalhes.length ? '<div class="linha-detalhe">' + detalhes.join("") + '</div>' : '') +
       '<div class="rodape"><span class="tempo" title="' + formatarData(f.horario_alarme) + '">' +
         tempoDecorrido(f.horario_alarme) + visto + marcaAuto + '</span>' +
-        '<div class="cartao-acoes">' + botoes + '</div></div>' +
+        rodapeDir + '</div>' +
+    '</div>';
+  }
+
+  var PESO_SEV = { critica: 3, alta: 2, media: 1 };
+  var ROTULO_SEV = { critica: "crítica", alta: "alta", media: "média" };
+  var sevTexto = function (s) { return ROTULO_SEV[s] || s || "—"; };
+
+  /** Um card por condomínio, reunindo todos os problemas dele naquela coluna. */
+  function cartaoGrupoHtml(itens, classeColuna) {
+    var f0 = itens[0];
+    var maisAntiga = itens.reduce(function (a, b) {
+      return new Date(a.horario_alarme || 0) <= new Date(b.horario_alarme || 0) ? a : b;
+    });
+    var temAtraso = itens.some(atrasada);
+
+    var cont = { critica: 0, alta: 0, media: 0 };
+    itens.forEach(function (f) { if (cont[f.severidade] !== undefined) cont[f.severidade]++; });
+    var pills = ["critica", "alta", "media"].filter(function (s) { return cont[s]; })
+      .map(function (s) {
+        var rot = s === "critica" ? "crítica" : s;
+        return '<span class="pill ' + s + '">' + cont[s] + ' ' + rot + (cont[s] > 1 ? 's' : '') + '</span>';
+      }).join("");
+
+    var ordenados = itens.slice().sort(function (a, b) {
+      return (PESO_SEV[b.severidade] || 0) - (PESO_SEV[a.severidade] || 0);
+    });
+    var linhas = ordenados.slice(0, 4).map(function (f) {
+      var onde = f.canal ? "Canal " + f.canal + (f.nome_camera ? " · " + escapeHtml(f.nome_camera) : "") : "Aparelho";
+      return '<li><span class="pt ' + escapeHtml(f.severidade || "media") + '"></span>' +
+        '<span>' + escapeHtml(f.tipo_falha) + ' — <span style="color:var(--text-muted)">' + onde + '</span></span></li>';
+    }).join("");
+    if (ordenados.length > 4) {
+      linhas += '<li><span class="pt" style="background:transparent"></span>' +
+        '<span class="mais">e mais ' + (ordenados.length - 4) + '...</span></li>';
+    }
+
+    var origens = Array.from(new Set(itens.map(origemDe)));
+    var origem = origens.length > 1 ? "ambas" : origens[0];
+
+    var h = horasDesde(maisAntiga.horario_alarme);
+    var sla = temAtraso ? '<div class="sla">⏰ mais antigo há ' + Math.floor(h) + 'h</div>' : '';
+    var quem = f0.atendido_por
+      ? '<span class="marca-nota">' + escapeHtml(f0.atendido_por) + '</span>'
+      : '<span class="marca-nota">abrir ›</span>';
+
+    return '<div class="cartao ' + classeColuna + (temAtraso ? ' atrasada' : '') +
+      '" data-ids="' + itens.map(function (f) { return f.id; }).join(",") + '" role="button" tabindex="0">' +
+      '<div class="topo"><div class="praca">' + escapeHtml(f0.dispositivo || "(sem praça)") + '</div>' +
+        '<span class="selo ' + origem + '">' + escapeHtml(ROTULO_ORIGEM[origem] || origem) + '</span></div>' +
+      (f0.filial ? '<div style="font-size:11px;color:var(--text-muted)">' + escapeHtml(f0.filial) + '</div>' : '') +
+      sla +
+      '<div class="tipo" style="margin:6px 0 7px">' + itens.length + ' problema' +
+        (itens.length > 1 ? 's' : '') + '</div>' +
+      '<div class="resumo-sev">' + pills + '</div>' +
+      '<ul class="itens-grupo">' + linhas + '</ul>' +
+      '<div class="rodape"><span class="tempo" title="' + formatarData(maisAntiga.horario_alarme) + '">' +
+        'mais antigo ' + tempoDecorrido(maisAntiga.horario_alarme) + '</span>' + quem + '</div>' +
     '</div>';
   }
 
   function renderChamados() {
     var lista = falhasFiltradas();
+    var agrupar = el("fAgrupar").checked;
     el("contChamados").textContent = lista.filter(emAberto).length;
 
-    // Mais antigos primeiro em Nova: a fila de atendimento é por idade, não por chegada.
+    // Mais antigos primeiro: a fila de atendimento é por idade, não por chegada.
     var ordenada = lista.slice().sort(function (a, b) {
       return new Date(a.horario_alarme || 0) - new Date(b.horario_alarme || 0);
     });
 
     elChamados.innerHTML = '<div class="quadro">' + COLUNAS.map(function (col) {
       var itens = ordenada.filter(function (f) { return f.status === col.status; });
-      if (col.status === "resolvida") itens = itens.reverse().slice(0, 100);
-      var corpo = itens.length
-        ? itens.map(function (f) { return cartaoHtml(f, col.classe); }).join("")
-        : '<div class="coluna-vazia">Nenhum evento aqui.</div>';
+      if (col.status === "resolvida") itens = itens.slice().reverse().slice(0, 200);
+
+      var corpo, contagem = itens.length;
+
+      if (agrupar) {
+        var grupos = [];
+        var indice = {};
+        itens.forEach(function (f) {
+          var k = f.dispositivo || "(sem praça)";
+          if (indice[k] === undefined) { indice[k] = grupos.length; grupos.push([]); }
+          grupos[indice[k]].push(f);
+        });
+        contagem = grupos.length;
+        corpo = grupos.length
+          ? grupos.map(function (g) { return cartaoGrupoHtml(g, col.classe); }).join("")
+          : '<div class="coluna-vazia">Nenhum evento aqui.</div>';
+      } else {
+        corpo = itens.length
+          ? itens.map(function (f) { return cartaoHtml(f, col.classe); }).join("")
+          : '<div class="coluna-vazia">Nenhum evento aqui.</div>';
+      }
+
       return '<div class="coluna"><div class="coluna-cabecalho">' +
         '<span class="ponto" style="background:' + col.cor + '"></span>' + col.titulo +
-        '<span class="contagem-col">' + itens.length + '</span></div>' +
+        '<span class="contagem-col" title="' + (agrupar ? itens.length + ' problema(s)' : '') + '">' +
+        contagem + '</span></div>' +
         '<div class="coluna-corpo">' + corpo + '</div></div>';
     }).join("") + '</div>';
 
-    Array.prototype.forEach.call(elChamados.querySelectorAll(".acao-btn"), function (btn) {
-      btn.addEventListener("click", async function () {
-        var id = btn.getAttribute("data-id");
-        var novoStatus = btn.getAttribute("data-novo-status");
-        var cartao = btn.closest(".cartao");
-        if (cartao) cartao.style.opacity = "0.5";
-        Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = true; });
-
-        var r = await supabase.from("dvr_falhas")
-          .update({ status: novoStatus, resolvido_por: null }).eq("id", id);
-
-        if (r.error) {
-          alert("Não consegui atualizar: " + r.error.message);
-          if (cartao) cartao.style.opacity = "1";
-          Array.prototype.forEach.call((cartao || document).querySelectorAll(".acao-btn"), function (b) { b.disabled = false; });
-          return;
-        }
-        var item = falhas.find(function (f) { return String(f.id) === String(id); });
-        if (item) { item.status = novoStatus; item.resolvido_por = null; }
-        render();
+    Array.prototype.forEach.call(elChamados.querySelectorAll(".cartao"), function (c) {
+      function abrir() {
+        var ids = c.getAttribute("data-ids") || c.getAttribute("data-id") || "";
+        abrirDetalhe(ids.split(",").filter(Boolean));
+      }
+      c.addEventListener("click", abrir);
+      c.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); }
       });
     });
+  }
+
+  // --- Painel de detalhe e atendimento --------------------------------------
+  var elModal = el("modal");
+
+  function operadorSalvo() {
+    try { return localStorage.getItem("dvr_operador") || ""; } catch (e) { return ""; }
+  }
+  function salvarOperador(nome) {
+    try { localStorage.setItem("dvr_operador", nome); } catch (e) { /* modo privado */ }
+  }
+
+  function campo(rot, val) {
+    return '<div class="campo"><div class="rot">' + escapeHtml(rot) + '</div>' +
+           '<div class="val">' + escapeHtml(val === null || val === undefined || val === "" ? "—" : val) +
+           '</div></div>';
+  }
+
+  function abrirDetalhe(ids) {
+    var lista = (Array.isArray(ids) ? ids : [ids]).map(function (id) {
+      return falhas.find(function (x) { return String(x.id) === String(id); });
+    }).filter(Boolean);
+    if (!lista.length) return;
+
+    var f = lista[0];
+    var grupo = lista.length > 1;
+    var ap = aparelhos.find(function (a) { return a.nome === f.dispositivo; }) || null;
+    var origem = origemDe(f);
+
+    var infoAparelho = ap
+      ? '<div class="campos">' +
+          campo("Situação na última varredura", ap.acessivel === false ? "Sem resposta" : "Respondendo") +
+          campo("Última varredura", tempoDecorrido(ap.ultima_varredura) + " (" + formatarData(ap.ultima_varredura) + ")") +
+          campo("Modo da varredura", ap.ultimo_modo) +
+          campo("Canais verificados", ap.canais_verificados) +
+          campo("Modelo", ap.modelo) +
+          campo("Firmware", ap.firmware) +
+          (ap.motivo ? campo("Motivo da falha de acesso", ap.motivo) : "") +
+        '</div>'
+      : '<div class="ajuda">Este aparelho ainda não foi registrado pela varredura direta. ' +
+        'Provavelmente a falha veio por e-mail e o DVR não está no devices.csv.</div>';
+
+    var acoes = "";
+    if (f.status === "aberta") {
+      acoes = '<button class="btn-acao primario" data-acao="em_andamento">Assumir atendimento</button>' +
+              '<button class="btn-acao resolver" data-acao="resolvida">Registrar e resolver</button>';
+    } else if (f.status === "em_andamento") {
+      acoes = '<button class="btn-acao resolver" data-acao="resolvida">Registrar e resolver</button>' +
+              '<button class="btn-acao" data-acao="aberta">Devolver para Nova</button>';
+    } else {
+      acoes = '<button class="btn-acao" data-acao="aberta">Reabrir</button>';
+    }
+
+    // Num grupo, o operador escolhe quais problemas o atendimento cobre.
+    var blocoItens;
+    if (grupo) {
+      var ordenados = lista.slice().sort(function (a, b) {
+        return (PESO_SEV[b.severidade] || 0) - (PESO_SEV[a.severidade] || 0);
+      });
+      blocoItens =
+        '<div class="modal-secao"><h3>' + lista.length + ' problemas neste condomínio</h3>' +
+        '<div class="barra-sel"><span id="contSel"></span>' +
+          '<button class="link-sel" id="selTodos">Marcar todos</button>' +
+          '<button class="link-sel" id="selNenhum">Desmarcar todos</button></div>' +
+        '<div class="lista-sel">' + ordenados.map(function (x) {
+          var onde = x.canal
+            ? "Canal " + x.canal + (x.nome_camera ? " · " + x.nome_camera : "")
+            : "Aparelho inteiro";
+          return '<label class="item-sel"><input type="checkbox" class="chk-item" value="' + x.id + '" checked />' +
+            '<span class="txt"><span class="tt">' + escapeHtml(x.tipo_falha) + '</span>' +
+            '<span class="dd">' + escapeHtml(onde) + ' · ' + escapeHtml(sevTexto(x.severidade)) +
+            ' · aberto ' + escapeHtml(tempoDecorrido(x.horario_alarme)) + '</span>' +
+            (x.detalhe ? '<span class="dd">' + escapeHtml(x.detalhe) + '</span>' : '') +
+            '</span></label>';
+        }).join("") + '</div></div>';
+    } else {
+      blocoItens =
+        (f.detalhe ? '<div class="modal-secao"><div class="detalhe-box">' +
+          escapeHtml(f.detalhe) + '</div></div>' : '') +
+        '<div class="modal-secao"><h3>Chamado</h3><div class="campos">' +
+          campo("Canal", f.canal) + campo("Câmera", f.nome_camera) +
+          campo("IP do DVR", f.ip_dvr) + campo("Severidade", sevTexto(f.severidade)) +
+          campo("Origem", ROTULO_ORIGEM[origem] || origem) +
+          campo("Aberto em", formatarData(f.horario_alarme)) +
+          campo("Confirmado pela varredura", f.visto_em ? tempoDecorrido(f.visto_em) : "—") +
+          campo("Assumido por", f.atendido_por) +
+        '</div></div>';
+    }
+
+    elModal.innerHTML =
+      '<div class="fundo-modal" id="fundoModal"><div class="modal" role="dialog" aria-modal="true">' +
+        '<div class="modal-cab">' +
+          '<div><h2>' + escapeHtml(f.dispositivo || "(sem praça)") + '</h2>' +
+          '<div class="sub">' + (grupo ? lista.length + ' problemas em aberto' : escapeHtml(f.tipo_falha)) +
+            (f.filial ? ' · ' + escapeHtml(f.filial) : '') + '</div></div>' +
+          '<button class="fechar" id="btnFechar" title="Fechar">×</button>' +
+        '</div>' +
+
+        '<div class="modal-corpo">' + blocoItens +
+
+          '<div class="modal-secao"><h3>Varredura do aparelho</h3>' + infoAparelho + '</div>' +
+
+          (!grupo && f.observacao
+            ? '<div class="modal-secao"><h3>Histórico de atendimento</h3>' +
+              '<div class="historico">' + escapeHtml(f.observacao) + '</div></div>'
+            : '') +
+
+          '<div class="modal-secao"><h3>Registrar atendimento</h3>' +
+            '<label for="mOperador">Quem está atendendo</label>' +
+            '<input type="text" id="mOperador" value="' + escapeHtml(operadorSalvo()) +
+              '" placeholder="Seu nome" />' +
+            '<div style="height:12px"></div>' +
+            '<label for="mNota">O que foi feito</label>' +
+            '<textarea id="mNota" placeholder="Ex.: HD substituído, gravação reativada e testada no canal 4."></textarea>' +
+            '<div class="ajuda">Obrigatório ao resolver. Cada anotação fica guardada com data e autor' +
+              (grupo ? ', em cada um dos problemas marcados acima.' : '.') + '</div>' +
+            '<div class="erro-campo" id="mErro" hidden></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="modal-rodape">' + acoes +
+          '<button class="btn-acao ao-lado" id="btnCancelar">Fechar</button></div>' +
+      '</div></div>';
+
+    var fundo = el("fundoModal");
+    function fechar() { elModal.innerHTML = ""; document.removeEventListener("keydown", esc); }
+    function esc(e) { if (e.key === "Escape") fechar(); }
+    document.addEventListener("keydown", esc);
+
+    el("btnFechar").addEventListener("click", fechar);
+    el("btnCancelar").addEventListener("click", fechar);
+    fundo.addEventListener("click", function (e) { if (e.target === fundo) fechar(); });
+
+    function marcados() {
+      if (!grupo) return lista;
+      var ids = Array.prototype.map.call(
+        elModal.querySelectorAll(".chk-item:checked"), function (c) { return c.value; });
+      return lista.filter(function (x) { return ids.indexOf(String(x.id)) !== -1; });
+    }
+
+    if (grupo) {
+      var atualizarContagem = function () {
+        el("contSel").textContent = marcados().length + " de " + lista.length + " selecionados";
+      };
+      Array.prototype.forEach.call(elModal.querySelectorAll(".chk-item"), function (c) {
+        c.addEventListener("change", atualizarContagem);
+      });
+      el("selTodos").addEventListener("click", function () {
+        Array.prototype.forEach.call(elModal.querySelectorAll(".chk-item"), function (c) { c.checked = true; });
+        atualizarContagem();
+      });
+      el("selNenhum").addEventListener("click", function () {
+        Array.prototype.forEach.call(elModal.querySelectorAll(".chk-item"), function (c) { c.checked = false; });
+        atualizarContagem();
+      });
+      atualizarContagem();
+    }
+
+    Array.prototype.forEach.call(elModal.querySelectorAll("[data-acao]"), function (btn) {
+      btn.addEventListener("click", function () {
+        gravarAtendimento(marcados(), btn.getAttribute("data-acao"), fechar, btn);
+      });
+    });
+
+    if (!operadorSalvo()) el("mOperador").focus(); else el("mNota").focus();
+  }
+
+  async function gravarAtendimento(alvos, novoStatus, fechar, btn) {
+    var operador = el("mOperador").value.trim();
+    var nota = el("mNota").value.trim();
+    var erro = el("mErro");
+
+    function falhar(msg) {
+      erro.textContent = msg; erro.hidden = false;
+    }
+    erro.hidden = true;
+
+    if (!alvos.length) return falhar("Marque pelo menos um problema.");
+    if (!operador) return falhar("Informe quem está atendendo.");
+    if (novoStatus === "resolvida" && !nota) {
+      return falhar("Descreva o que foi feito antes de resolver — é esse registro que fica para a equipe.");
+    }
+
+    salvarOperador(operador);
+
+    var agora = new Date();
+    var carimbo = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo",
+      day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+    var rotuloAcao = novoStatus === "em_andamento" ? "assumiu"
+      : novoStatus === "resolvida" ? "resolveu" : "devolveu para Nova";
+
+    var linha = "[" + carimbo + "] " + operador + " " + rotuloAcao +
+      (alvos.length > 1 ? " (" + alvos.length + " problemas juntos)" : "") +
+      (nota ? ": " + nota : "");
+
+    Array.prototype.forEach.call(elModal.querySelectorAll("button"), function (b) { b.disabled = true; });
+    var rotuloOriginal = btn.textContent;
+    btn.textContent = "Salvando...";
+
+    // Cada chamado guarda o próprio histórico, por isso um update por linha.
+    var patches = alvos.map(function (x) {
+      var p = {
+        status: novoStatus,
+        observacao: x.observacao ? (x.observacao + "\n" + linha) : linha,
+        atendido_por: operador,
+        resolvido_por: null
+      };
+      if (novoStatus === "em_andamento" && !x.atendido_em) p.atendido_em = agora.toISOString();
+      if (novoStatus === "resolvida") p.resolvido_em = agora.toISOString();
+      return p;
+    });
+
+    var resultados = await Promise.all(alvos.map(function (x, i) {
+      return supabase.from("dvr_falhas").update(patches[i]).eq("id", x.id);
+    }));
+
+    var falhou = resultados.filter(function (r) { return r.error; });
+    if (falhou.length) {
+      Array.prototype.forEach.call(elModal.querySelectorAll("button"), function (b) { b.disabled = false; });
+      btn.textContent = rotuloOriginal;
+      return falhar(falhou.length + " de " + alvos.length + " não salvaram: " + falhou[0].error.message);
+    }
+
+    alvos.forEach(function (x, i) { Object.assign(x, patches[i]); });
+    fechar();
+    render();
   }
 
   // --- Exportar -------------------------------------------------------------
@@ -772,7 +1182,7 @@
     render();
   });
 
-  [fFilial, fPraca, fTipo, fSeveridade, fOrigem].forEach(function (s) {
+  [fFilial, fPraca, fTipo, fSeveridade, fOrigem, el("fAgrupar")].forEach(function (s) {
     s.addEventListener("change", render);
   });
   fBusca.addEventListener("input", render);
