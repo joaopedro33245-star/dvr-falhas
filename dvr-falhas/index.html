@@ -354,6 +354,19 @@
     white-space: pre-wrap; max-height: 180px; overflow-y: auto;
   }
 
+  .antes {
+    background: var(--page-plane); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 13px; margin-bottom: 6px;
+  }
+  .antes-cab {
+    display: flex; flex-wrap: wrap; gap: 4px 14px;
+    font-size: 11.5px; color: var(--text-muted); margin-bottom: 5px;
+  }
+  .antes-nota {
+    font-size: 12.5px; color: var(--text-secondary);
+    line-height: 1.55; white-space: pre-wrap;
+  }
+
   .modal label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
   .modal input[type="text"], .modal textarea {
     width: 100%; font: inherit; font-size: 13px;
@@ -988,9 +1001,13 @@
           '<div class="modal-secao"><h3>Varredura do aparelho</h3>' + infoAparelho + '</div>' +
 
           (!grupo && f.observacao
-            ? '<div class="modal-secao"><h3>Histórico de atendimento</h3>' +
+            ? '<div class="modal-secao"><h3>Histórico deste chamado</h3>' +
               '<div class="historico">' + escapeHtml(f.observacao) + '</div></div>'
             : '') +
+
+          '<div class="modal-secao" id="secaoReincidencia" hidden>' +
+            '<h3 id="tituloReincidencia">Já aconteceu antes</h3>' +
+            '<div id="listaReincidencia"></div></div>' +
 
           '<div class="modal-secao"><h3>Registrar atendimento</h3>' +
             '<label for="mOperador">Quem está atendendo</label>' +
@@ -1050,6 +1067,65 @@
     });
 
     if (!operadorSalvo()) el("mOperador").focus(); else el("mNota").focus();
+
+    carregarReincidencia(f, grupo);
+  }
+
+  /**
+   * Busca no banco o que já foi feito neste mesmo ponto antes.
+   *
+   * Quando uma falha volta, o coletor abre um card novo e limpo — o que foi
+   * feito da última vez fica no card antigo, já resolvido. Sem isto, o
+   * operador refaz a investigação inteira a cada reincidência.
+   */
+  async function carregarReincidencia(f, grupo) {
+    var secao = el("secaoReincidencia");
+    if (!secao) return;
+
+    // Os filtros vêm antes de order/limit: encadear depois funciona em algumas
+    // versões do cliente e quebra em outras.
+    var q = supabase.from("dvr_falhas")
+      .select("id,canal,nome_camera,tipo_falha,horario_alarme,resolvido_em,atendido_por,observacao,resolvido_por")
+      .eq("status", "resolvida")
+      .neq("id", f.id);
+
+    if (f.ip_dvr) q = q.eq("ip_dvr", f.ip_dvr);
+    else q = q.eq("dispositivo", f.dispositivo);
+
+    // Num chamado único, o histórico é do mesmo ponto exato.
+    // Num grupo, é a memória do condomínio inteiro.
+    if (!grupo) {
+      q = q.eq("tipo_falha", f.tipo_falha);
+      if (f.canal === null || f.canal === undefined) q = q.is("canal", null);
+      else q = q.eq("canal", f.canal);
+    }
+
+    var r = await q.order("horario_alarme", { ascending: false }).limit(6);
+    if (r.error || !r.data || !r.data.length) return;
+
+    // Só interessa o que alguém registrou; fechamento automático não ensina nada.
+    var comRegistro = r.data.filter(function (x) { return x.observacao; });
+    if (!comRegistro.length) return;
+
+    el("tituloReincidencia").textContent = grupo
+      ? "Atendimentos anteriores neste condomínio"
+      : "Já aconteceu antes neste ponto — " + comRegistro.length + " vez(es) com registro";
+
+    el("listaReincidencia").innerHTML = comRegistro.map(function (x) {
+      var onde = grupo
+        ? escapeHtml(x.tipo_falha) + (x.canal ? " · canal " + escapeHtml(x.canal) : "")
+        : "";
+      return '<div class="antes">' +
+        '<div class="antes-cab">' +
+          '<span>' + escapeHtml(formatarData(x.horario_alarme)) + '</span>' +
+          (onde ? '<span>' + onde + '</span>' : '') +
+          (x.atendido_por ? '<span>' + escapeHtml(x.atendido_por) + '</span>' : '') +
+        '</div>' +
+        '<div class="antes-nota">' + escapeHtml(x.observacao) + '</div>' +
+      '</div>';
+    }).join("");
+
+    secao.hidden = false;
   }
 
   async function gravarAtendimento(alvos, novoStatus, fechar, btn) {
